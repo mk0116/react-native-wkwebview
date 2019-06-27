@@ -71,10 +71,12 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     _contentInset = UIEdgeInsetsZero;
 
     WKWebView *currentWebView;
-    for( int i = 0 ; i < webViewsInUse.count ; i++) {
-      if ([webViewsInUse[i]  isEqual: @NO]) {
-        currentWebView = webViews[i];
-        currentWebViewId = i;
+    for( long i = 0 ; i < webViewsInUse.count ; i++) {
+      long index = (lastWebViewId + i + 1) % webViewsInUse.count;
+      if ([webViewsInUse[index]  isEqual: @NO]) {
+        currentWebView = webViews[index];
+        currentWebViewId = index;
+        lastWebViewId = index;
         break;
       }
     }
@@ -90,7 +92,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
        [NSString stringWithFormat:@"reactNative%lu", currentWebViewId]];
       config.userContentController = userController;
       currentWebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
-
       [webViews addObject:currentWebView];
       [webViewsInUse addObject: @YES];
     } else {

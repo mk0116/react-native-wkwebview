@@ -13,6 +13,7 @@
 extern NSString *const RCTJSNavigationScheme;
 static NSMutableArray *webViews;
 static NSMutableArray *webViewsInUse;
+static long lastWebViewId = -1;
 
 @protocol CRAWKWebViewDelegate <NSObject>
 
