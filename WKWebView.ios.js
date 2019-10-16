@@ -460,6 +460,14 @@ class WKWebView extends React.Component {
     return WKWebViewManager.evaluateJavaScript(this.getWebViewHandle(), js);
   };
 
+  static nextWebView = () => {
+    return WKWebViewManager.nextWebView('');
+  };
+
+  static reset = () => {
+    return WKWebViewManager.reset('');
+  }
+
   /**
    * We return an event with a bunch of fields including:
    *  url, title, loading, canGoBack, canGoForward
