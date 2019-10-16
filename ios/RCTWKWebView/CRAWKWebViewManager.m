@@ -215,4 +215,14 @@ RCT_EXPORT_METHOD(startLoadWithResult:(BOOL)result lockIdentifier:(NSInteger)loc
   }
 }
 
+RCT_EXPORT_METHOD(nextWebView:(NSString *)reactTag)
+{
+  [CRAWKWebView nextWebview];
+}
+
+RCT_EXPORT_METHOD(reset:(NSString *)reactTag)
+{
+  [CRAWKWebView reset];
+}
+
 @end
