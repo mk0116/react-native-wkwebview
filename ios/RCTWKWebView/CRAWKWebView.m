@@ -47,7 +47,7 @@
   BOOL _injectedJavaScriptForMainFrameOnly;
   NSString *_injectJavaScript;
   NSString *_injectedJavaScript;
-  long currentWebViewId;
+  long webViewId;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -61,45 +61,31 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 {
   if (webViews == nil) {
     webViews = [NSMutableArray array];
-    webViewsInUse = [NSMutableArray array];
   }
+
+  if (webViews.count < 3) {
+    currentWebViewId = webViews.count;
+    WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
+    config.processPool = processPool;
+    config.mediaPlaybackRequiresUserAction = false;
+    config.allowsInlineMediaPlayback = true;
+    WKUserContentController* userController = [[WKUserContentController alloc]init];
+    config.userContentController = userController;
+    WKWebView *currentWebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
+    [webViews addObject:currentWebView];
+  }
+  webViewId = currentWebViewId;
 
   if(self = [self initWithFrame:CGRectZero])
   {
     super.backgroundColor = [UIColor clearColor];
     _automaticallyAdjustContentInsets = YES;
     _contentInset = UIEdgeInsetsZero;
-
-    WKWebView *currentWebView;
-    for( long i = 0 ; i < webViewsInUse.count ; i++) {
-      long index = (lastWebViewId + i + 1) % webViewsInUse.count;
-      if ([webViewsInUse[index]  isEqual: @NO]) {
-        currentWebView = webViews[index];
-        currentWebViewId = index;
-        lastWebViewId = index;
-        break;
-      }
-    }
-
-    if (currentWebView == nil) {
-      currentWebViewId = webViewsInUse.count;
-      WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
-      config.processPool = processPool;
-      config.mediaPlaybackRequiresUserAction = false;
-      config.allowsInlineMediaPlayback = true;
-      WKUserContentController* userController = [[WKUserContentController alloc]init];
-      [userController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:
-       [NSString stringWithFormat:@"reactNative%lu", currentWebViewId]];
-      config.userContentController = userController;
-      currentWebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
-      [webViews addObject:currentWebView];
-      [webViewsInUse addObject: @YES];
-    } else {
-      NSString* name = [NSString stringWithFormat:@"reactNative%lu", currentWebViewId];
-      [currentWebView.configuration setProcessPool: processPool];
-      [currentWebView.configuration.userContentController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:name];
-      webViewsInUse[currentWebViewId] = @YES;
-    }
+    
+    WKWebView *currentWebView = webViews[webViewId];
+    NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
+    [currentWebView.configuration setProcessPool: processPool];
+    [currentWebView.configuration.userContentController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:name];
 
     _webView = currentWebView;
     _webView.UIDelegate = self;
@@ -177,7 +163,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                            "if (typeof targetOrigin !== 'undefined') {"
                               "window.originalPostMessage(message, targetOrigin, transfer);"
                            "}"
-                         "};", currentWebViewId];
+                         "};", webViewId];
     WKUserScript *script = [[WKUserScript alloc] initWithSource:source
                                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart
                                                forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
@@ -448,14 +434,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)dealloc
 {
-  NSString* name = [NSString stringWithFormat:@"reactNative%lu", currentWebViewId];
+  NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
   [_webView.configuration.userContentController removeScriptMessageHandlerForName:name];
   [_webView removeFromSuperview];
   [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
   _webView.navigationDelegate = nil;
   _webView.UIDelegate = nil;
   _webView.scrollView.delegate = nil;
-  webViewsInUse[currentWebViewId] = @NO;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -663,6 +648,17 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 
   decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
++ (void)nextWebview
+{
+  currentWebViewId = (currentWebViewId + 1) % 3;
+}
+
++ (void)reset
+{
+  currentWebViewId = 0;
+  [webViews removeAllObjects];
 }
 
 @end
