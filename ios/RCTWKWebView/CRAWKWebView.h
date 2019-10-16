@@ -12,8 +12,8 @@
  */
 extern NSString *const RCTJSNavigationScheme;
 static NSMutableArray *webViews;
-static NSMutableArray *webViewsInUse;
 static long lastWebViewId = -1;
+static long currentWebViewId;
 
 @protocol CRAWKWebViewDelegate <NSObject>
 
@@ -51,5 +51,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 - (void)stopLoading;
 - (void)postMessage:(NSString *)message;
 - (void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^)(id, NSError *error))completionHandler;
++ (void)nextWebview;
++ (void)reset;
 
 @end
