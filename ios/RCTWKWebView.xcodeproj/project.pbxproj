@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041562FB2358085C00FB6960 /* CRAWKLectureWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 041562FA2358085C00FB6960 /* CRAWKLectureWebViewManager.m */; };
+		0415630823580A3000FB6960 /* CRAWKLectureWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0415630723580A3000FB6960 /* CRAWKLectureWebView.m */; };
+		0415630923580A5200FB6960 /* CRAWKLectureWebView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04156304235809A300FB6960 /* CRAWKLectureWebView.h */; };
+		0415630A23580A5200FB6960 /* CRAWKLectureWebViewManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04156305235809E800FB6960 /* CRAWKLectureWebViewManager.h */; };
 		097457AB1D2A457C000D9368 /* CRAWKWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 097457A91D2A457C000D9368 /* CRAWKWebViewManager.m */; };
 		097457AE1D2A4595000D9368 /* CRAWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 097457AD1D2A4595000D9368 /* CRAWKWebView.m */; };
 		097457AF1D2AF4E0000D9368 /* CRAWKWebView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 097457AC1D2A4595000D9368 /* CRAWKWebView.h */; };
@@ -22,6 +26,8 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				0415630923580A5200FB6960 /* CRAWKLectureWebView.h in CopyFiles */,
+				0415630A23580A5200FB6960 /* CRAWKLectureWebViewManager.h in CopyFiles */,
 				097457AF1D2AF4E0000D9368 /* CRAWKWebView.h in CopyFiles */,
 				097457B01D2AF4E0000D9368 /* CRAWKWebViewManager.h in CopyFiles */,
 			);
@@ -30,6 +36,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		041562FA2358085C00FB6960 /* CRAWKLectureWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CRAWKLectureWebViewManager.m; sourceTree = "<group>"; };
+		04156304235809A300FB6960 /* CRAWKLectureWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CRAWKLectureWebView.h; sourceTree = "<group>"; };
+		04156305235809E800FB6960 /* CRAWKLectureWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CRAWKLectureWebViewManager.h; sourceTree = "<group>"; };
+		0415630723580A3000FB6960 /* CRAWKLectureWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CRAWKLectureWebView.m; sourceTree = "<group>"; };
 		0974579A1D2A440A000D9368 /* libRCTWKWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTWKWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		097457A81D2A457C000D9368 /* CRAWKWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CRAWKWebViewManager.h; sourceTree = "<group>"; };
 		097457A91D2A457C000D9368 /* CRAWKWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = CRAWKWebViewManager.m; sourceTree = "<group>"; tabWidth = 2; };
@@ -73,8 +83,12 @@
 			children = (
 				097457AC1D2A4595000D9368 /* CRAWKWebView.h */,
 				097457AD1D2A4595000D9368 /* CRAWKWebView.m */,
+				04156304235809A300FB6960 /* CRAWKLectureWebView.h */,
+				0415630723580A3000FB6960 /* CRAWKLectureWebView.m */,
 				097457A81D2A457C000D9368 /* CRAWKWebViewManager.h */,
 				097457A91D2A457C000D9368 /* CRAWKWebViewManager.m */,
+				04156305235809E800FB6960 /* CRAWKLectureWebViewManager.h */,
+				041562FA2358085C00FB6960 /* CRAWKLectureWebViewManager.m */,
 				3E609CF41EAA815D00187C8C /* WeakScriptMessageDelegate.h */,
 				3E609CF51EAA815D00187C8C /* WeakScriptMessageDelegate.m */,
 				E683F3D32080F2E10005F1F5 /* WKProcessPool+SharedProcessPool.h */,
@@ -121,6 +135,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 097457911D2A440A000D9368;
@@ -139,9 +154,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				097457AB1D2A457C000D9368 /* CRAWKWebViewManager.m in Sources */,
+				041562FB2358085C00FB6960 /* CRAWKLectureWebViewManager.m in Sources */,
 				3E609CF61EAA815D00187C8C /* WeakScriptMessageDelegate.m in Sources */,
 				E683F3D72080F3400005F1F5 /* WKProcessPool+SharedProcessPool.m in Sources */,
 				097457AE1D2A4595000D9368 /* CRAWKWebView.m in Sources */,
+				0415630823580A3000FB6960 /* CRAWKLectureWebView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,7 +271,7 @@
 					"$(SRCROOT)/../react-native/React/**",
 					"$(SRCROOT)/../../../node_modules/react-native/React/**",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -270,7 +287,7 @@
 					"$(SRCROOT)/../react-native/React/**",
 					"$(SRCROOT)/../../../node_modules/react-native/React/**",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
