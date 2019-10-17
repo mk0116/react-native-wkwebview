@@ -19,6 +19,7 @@ import deprecatedPropType from 'react-native/Libraries/Utilities/deprecatedPropT
 import invariant from 'fbjs/lib/invariant';
 import keyMirror from 'fbjs/lib/keyMirror';
 const WKWebViewManager = NativeModules.CRAWKWebViewManager;
+const WKLectureWebViewManager = NativeModules.CRAWKLectureWebViewManager;
 
 var BGWASH = 'rgba(255,255,255,0.8)';
 
@@ -318,7 +319,12 @@ class WKWebView extends React.Component {
     const onShouldStartLoadWithRequest = this.props.onShouldStartLoadWithRequest && ((event: Event) => {
       const shouldStart = this.props.onShouldStartLoadWithRequest &&
         this.props.onShouldStartLoadWithRequest(event.nativeEvent);
-      WKWebViewManager.startLoadWithResult(!!shouldStart, event.nativeEvent.lockIdentifier);
+      if (this.props.isLecture) {
+        WKLectureWebViewManager.startLoadWithResult(!!shouldStart, event.nativeEvent.lockIdentifier);
+      }
+      else {
+        WKWebViewManager.startLoadWithResult(!!shouldStart, event.nativeEvent.lockIdentifier);
+      }
     });
 
     let source = this.props.source;
@@ -338,38 +344,72 @@ class WKWebView extends React.Component {
     const messagingEnabled = typeof this.props.onMessage === 'function';
 
     const webView =
-      <CRAWKWebView
-        ref={ref => { this.webview = ref; }}
-        key="webViewKey"
-        style={webViewStyles}
-        contentInsetAdjustmentBehavior={this.props.contentInsetAdjustmentBehavior}
-        source={resolveAssetSource(source)}
-        injectJavaScriptForMainFrameOnly={this.props.injectJavaScriptForMainFrameOnly}
-        injectedJavaScriptForMainFrameOnly={this.props.injectedJavaScriptForMainFrameOnly}
-        injectJavaScript={this.props.injectJavaScript}
-        injectedJavaScript={this.props.injectedJavaScript}
-        bounces={this.props.bounces}
-        scrollEnabled={this.props.scrollEnabled}
-        contentInset={this.props.contentInset}
-        allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
-        automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
-        openNewWindowInWebView={this.props.openNewWindowInWebView}
-        hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
-        keyboardDisplayRequiresUserAction={this.props.keyboardDisplayRequiresUserAction}
-        allowsLinkPreview={this.props.allowsLinkPreview}
-        onLoadingStart={this._onLoadingStart}
-        onLoadingFinish={this._onLoadingFinish}
-        onLoadingError={this._onLoadingError}
-        messagingEnabled={messagingEnabled}
-        onProgress={this._onProgress}
-        onMessage={this._onMessage}
-        onScroll={this._onScroll}
-        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-        pagingEnabled={this.props.pagingEnabled}
-        directionalLockEnabled={this.props.directionalLockEnabled}
-        onNavigationResponse={this._onNavigationResponse}
-        keyboardDismissMode={this.props.keyboardDismissMode}
-      />;
+      this.props.isLecture ?
+        <CRAWKLectureWebView
+          ref={ref => { this.webview = ref; }}
+          key="lectureWebViewKey"
+          style={webViewStyles}
+          contentInsetAdjustmentBehavior={this.props.contentInsetAdjustmentBehavior}
+          source={resolveAssetSource(source)}
+          injectJavaScriptForMainFrameOnly={this.props.injectJavaScriptForMainFrameOnly}
+          injectedJavaScriptForMainFrameOnly={this.props.injectedJavaScriptForMainFrameOnly}
+          injectJavaScript={this.props.injectJavaScript}
+          injectedJavaScript={this.props.injectedJavaScript}
+          bounces={this.props.bounces}
+          scrollEnabled={this.props.scrollEnabled}
+          contentInset={this.props.contentInset}
+          allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+          automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
+          openNewWindowInWebView={this.props.openNewWindowInWebView}
+          hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
+          keyboardDisplayRequiresUserAction={this.props.keyboardDisplayRequiresUserAction}
+          allowsLinkPreview={this.props.allowsLinkPreview}
+          onLoadingStart={this._onLoadingStart}
+          onLoadingFinish={this._onLoadingFinish}
+          onLoadingError={this._onLoadingError}
+          messagingEnabled={messagingEnabled}
+          onProgress={this._onProgress}
+          onMessage={this._onMessage}
+          onScroll={this._onScroll}
+          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+          pagingEnabled={this.props.pagingEnabled}
+          directionalLockEnabled={this.props.directionalLockEnabled}
+          onNavigationResponse={this._onNavigationResponse}
+          keyboardDismissMode={this.props.keyboardDismissMode}
+        />
+        :
+        <CRAWKWebView
+          ref={ref => { this.webview = ref; }}
+          key="webViewKey"
+          style={webViewStyles}
+          contentInsetAdjustmentBehavior={this.props.contentInsetAdjustmentBehavior}
+          source={resolveAssetSource(source)}
+          injectJavaScriptForMainFrameOnly={this.props.injectJavaScriptForMainFrameOnly}
+          injectedJavaScriptForMainFrameOnly={this.props.injectedJavaScriptForMainFrameOnly}
+          injectJavaScript={this.props.injectJavaScript}
+          injectedJavaScript={this.props.injectedJavaScript}
+          bounces={this.props.bounces}
+          scrollEnabled={this.props.scrollEnabled}
+          contentInset={this.props.contentInset}
+          allowsBackForwardNavigationGestures={this.props.allowsBackForwardNavigationGestures}
+          automaticallyAdjustContentInsets={this.props.automaticallyAdjustContentInsets}
+          openNewWindowInWebView={this.props.openNewWindowInWebView}
+          hideKeyboardAccessoryView={this.props.hideKeyboardAccessoryView}
+          keyboardDisplayRequiresUserAction={this.props.keyboardDisplayRequiresUserAction}
+          allowsLinkPreview={this.props.allowsLinkPreview}
+          onLoadingStart={this._onLoadingStart}
+          onLoadingFinish={this._onLoadingFinish}
+          onLoadingError={this._onLoadingError}
+          messagingEnabled={messagingEnabled}
+          onProgress={this._onProgress}
+          onMessage={this._onMessage}
+          onScroll={this._onScroll}
+          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+          pagingEnabled={this.props.pagingEnabled}
+          directionalLockEnabled={this.props.directionalLockEnabled}
+          onNavigationResponse={this._onNavigationResponse}
+          keyboardDismissMode={this.props.keyboardDismissMode}
+        />
 
     return (
       <View style={styles.container}>
@@ -385,7 +425,7 @@ class WKWebView extends React.Component {
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this.getCRAWKWebView().Commands.goForward,
+      this.getWebView().Commands.goForward,
       null
     );
   };
@@ -396,7 +436,7 @@ class WKWebView extends React.Component {
   goBack = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this.getCRAWKWebView().Commands.goBack,
+      this.getWebView().Commands.goBack,
       null
     );
   };
@@ -405,14 +445,24 @@ class WKWebView extends React.Component {
    * Indicating whether there is a back item in the back-forward list that can be navigated to
    */
   canGoBack = () => {
-    return WKWebViewManager.canGoBack(this.getWebViewHandle());
+    if (this.props.isLecture) {
+      return WKLectureWebViewManager.canGoBack(this.getWebViewHandle());
+    }
+    else {
+      return WKWebViewManager.canGoBack(this.getWebViewHandle());
+    }
   };
 
   /**
    * Indicating whether there is a forward item in the back-forward list that can be navigated to
    */
   canGoForward = () => {
-    return WKWebViewManager.canGoForward(this.getWebViewHandle());
+    if (this.props.isLecture) {
+      return WKLectureWebViewManager.canGoForward(this.getWebViewHandle());
+    }
+    else {
+      return WKWebViewManager.canGoForward(this.getWebViewHandle());
+    }
   };
 
   /**
@@ -422,7 +472,7 @@ class WKWebView extends React.Component {
     this.setState({ viewState: WebViewState.LOADING });
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this.getCRAWKWebView().Commands.reload,
+      this.getWebView().Commands.reload,
       null
     );
   };
@@ -433,7 +483,7 @@ class WKWebView extends React.Component {
   stopLoading = () => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this.getCRAWKWebView().Commands.stopLoading,
+      this.getWebView().Commands.stopLoading,
       null
     )
   };
@@ -451,13 +501,18 @@ class WKWebView extends React.Component {
   postMessage = (data) => {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewHandle(),
-      this.getCRAWKWebView().Commands.postMessage,
+      this.getWebView().Commands.postMessage,
       [String(data)]
     );
   };
 
   evaluateJavaScript = (js) => {
-    return WKWebViewManager.evaluateJavaScript(this.getWebViewHandle(), js);
+    if (this.props.isLecture) {
+      return WKLectureWebViewManager.evaluateJavaScript(this.getWebViewHandle(), js);
+    }
+    else {
+      return WKWebViewManager.evaluateJavaScript(this.getWebViewHandle(), js);
+    }
   };
 
   static nextWebView = () => {
@@ -478,13 +533,22 @@ class WKWebView extends React.Component {
     }
   };
 
-  getCRAWKWebView = () => {
-    return (
-      UIManager.getViewManagerConfig ?
-      UIManager.getViewManagerConfig('CRAWKWebView') :
-      UIManager.CRAWKWebView
-    );
-  };
+  getWebView = () => {
+    if (this.props.isLecture) {
+      return (
+        UIManager.getViewManagerConfig ?
+          UIManager.getViewManagerConfig('CRAWKLectureWebView') :
+          UIManager.CRAWKLectureWebView
+      );
+    }
+    else {
+      return (
+        UIManager.getViewManagerConfig ?
+          UIManager.getViewManagerConfig('CRAWKWebView') :
+          UIManager.CRAWKWebView
+      );
+    }
+  }
 
   /**
    * Returns the native webview node.
@@ -544,6 +608,16 @@ class WKWebView extends React.Component {
 }
 
 const CRAWKWebView = requireNativeComponent('CRAWKWebView', WKWebView, {
+  nativeOnly: {
+    onLoadingStart: true,
+    onLoadingError: true,
+    onLoadingFinish: true,
+    onMessage: true,
+    messagingEnabled: PropTypes.bool,
+  }
+});
+
+const CRAWKLectureWebView = requireNativeComponent('CRAWKLectureWebView', WKWebView, {
   nativeOnly: {
     onLoadingStart: true,
     onLoadingError: true,
