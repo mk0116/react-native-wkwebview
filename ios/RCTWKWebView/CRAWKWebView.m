@@ -113,7 +113,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)setInjectJavaScript:(NSString *)injectJavaScript {
-  RCTLog(@"setInjectJavaScript");
   _injectJavaScript = injectJavaScript;
   self.atStartScript = [[WKUserScript alloc] initWithSource:injectJavaScript
                                               injectionTime:WKUserScriptInjectionTimeAtDocumentStart
@@ -122,7 +121,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)setInjectedJavaScript:(NSString *)script {
-  RCTLog(@"setInjectedJavaScript");
   _injectedJavaScript = script;
   self.atEndScript = [[WKUserScript alloc] initWithSource:script
                                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
@@ -131,7 +129,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)setInjectedJavaScriptForMainFrameOnly:(BOOL)injectedJavaScriptForMainFrameOnly {
-  RCTLog(@"setInjectedJavaScriptForMainFrameOnly");
   _injectedJavaScriptForMainFrameOnly = injectedJavaScriptForMainFrameOnly;
   if (_injectedJavaScript != nil) {
     [self setInjectedJavaScript:_injectedJavaScript];
@@ -139,7 +136,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)setInjectJavaScriptForMainFrameOnly:(BOOL)injectJavaScriptForMainFrameOnly {
-  RCTLog(@"setInjectJavaScriptForMainFrameOnly");
   _injectJavaScriptForMainFrameOnly = injectJavaScriptForMainFrameOnly;
   if (_injectJavaScript != nil) {
     [self setInjectJavaScript:_injectJavaScript];
@@ -147,33 +143,22 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 }
 
 - (void)setMessagingEnabled:(BOOL)messagingEnabled {
-  RCTLog(@"setMessagingEnabled %@, %@",
-         _messagingEnabled ? @"Yes" : @"No", messagingEnabled ? @"Yes" : @"No");
   _messagingEnabled = messagingEnabled;
   [self setupPostMessageScript];
 }
 
 - (void)resetupScripts {
-  NSUInteger userScriptCount = [[_webView.configuration.userContentController userScripts] count];
-  RCTLog(@"userScriptCount = %lu", userScriptCount);
-//  if (userScriptCount > 1) {
-//    RCTLog(@"userScripts already set");
-//    return;
-//  }
   [_webView.configuration.userContentController removeAllUserScripts];
   [self setupPostMessageScript];
   if (self.atStartScript) {
     [_webView.configuration.userContentController addUserScript:self.atStartScript];
-    RCTLog(@"atStartScript is set");
   }
   if (self.atEndScript) {
     [_webView.configuration.userContentController addUserScript:self.atEndScript];
-    RCTLog(@"atEndScript is set");
   }
 }
 
 - (void)setupPostMessageScript {
-  RCTLog(@"setupPostMessageScript");
   if (_messagingEnabled) {
     NSString* source = [NSString stringWithFormat:
                         @"window.originalPostMessage = window.postMessage;"
