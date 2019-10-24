@@ -84,9 +84,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     
     WKWebView *currentWebView = webViews[webViewId];
     NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
-    if([currentWebView superview] != nil) {
+    UIView* superView = [currentWebView superview];
+    if(superView != nil) {
       [currentWebView.configuration.userContentController removeScriptMessageHandlerForName:name];
       [currentWebView removeFromSuperview];
+      [currentWebView removeObserver:superView forKeyPath:@"estimatedProgress"];
     }
     [currentWebView.configuration setProcessPool: processPool];
     [currentWebView.configuration.userContentController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:name];
@@ -438,8 +440,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)dealloc
 {
-  if([_webView superview] != self) {
-    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+  if ([_webView superview] != self) {
     return;
   }
   NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
