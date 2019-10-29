@@ -666,8 +666,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 + (void)reset
 {
-  currentWebViewId = 0;
-  [webViews removeAllObjects];
+  if (webViews != nil && webViews.count > 0) {
+    currentWebViewId = 0;
+    [webViews removeAllObjects];
+    webViews = nil;
+  }
 }
 
 @end
