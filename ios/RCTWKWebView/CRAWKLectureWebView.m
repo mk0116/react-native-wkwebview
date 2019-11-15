@@ -47,7 +47,7 @@
   BOOL _injectedJavaScriptForMainFrameOnly;
   NSString *_injectJavaScript;
   NSString *_injectedJavaScript;
-  long webViewId;
+  long currentWebViewId;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -60,52 +60,66 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (instancetype)initWithProcessPool:(WKProcessPool *)processPool
 {
   if (webViews == nil) {
-    webViews = [NSMutableArray array];
-  }
-
-  if (webViews.count < 3) {
-    currentWebViewId = webViews.count;
-    WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
-    config.processPool = processPool;
-    config.mediaPlaybackRequiresUserAction = false;
-    config.allowsInlineMediaPlayback = true;
-    WKUserContentController* userController = [[WKUserContentController alloc]init];
-    config.userContentController = userController;
-    WKWebView *currentWebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
-    [webViews addObject:currentWebView];
-  }
-  webViewId = currentWebViewId;
-
-  if(self = [self initWithFrame:CGRectZero])
-  {
-    super.backgroundColor = [UIColor clearColor];
-    _automaticallyAdjustContentInsets = YES;
-    _contentInset = UIEdgeInsetsZero;
-
-    WKWebView *currentWebView = webViews[webViewId];
-    NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
-    [currentWebView.configuration setProcessPool: processPool];
-    [currentWebView.configuration.userContentController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:name];
-
-    _webView = currentWebView;
-    _webView.UIDelegate = self;
-    _webView.navigationDelegate = self;
-    _webView.scrollView.delegate = self;
-
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
-    // `contentInsetAdjustmentBehavior` is only available since iOS 11.
-    // We set the default behavior to "never" so that iOS
-    // doesn't do weird things to UIScrollView insets automatically
-    // and keeps it as an opt-in behavior.
-    if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
-      _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+      webViews = [NSMutableArray array];
+      webViewsInUse = [NSMutableArray array];
     }
-#endif
-    [self setupPostMessageScript];
-    [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
-    [self addSubview:_webView];
-  }
-  return self;
+
+    if(self = [self initWithFrame:CGRectZero])
+    {
+      super.backgroundColor = [UIColor clearColor];
+      _automaticallyAdjustContentInsets = YES;
+      _contentInset = UIEdgeInsetsZero;
+
+      WKWebView *currentWebView;
+      for( long i = 0 ; i < webViewsInUse.count ; i++) {
+        long index = (lastWebViewId + i + 1) % webViewsInUse.count;
+        if ([webViewsInUse[index]  isEqual: @NO]) {
+          currentWebView = webViews[index];
+          currentWebViewId = index;
+          lastWebViewId = index;
+          break;
+        }
+      }
+
+      if (currentWebView == nil) {
+        currentWebViewId = webViewsInUse.count;
+        WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
+        config.processPool = processPool;
+        config.mediaPlaybackRequiresUserAction = false;
+        config.allowsInlineMediaPlayback = true;
+        WKUserContentController* userController = [[WKUserContentController alloc]init];
+        [userController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:
+         [NSString stringWithFormat:@"reactNative%lu", currentWebViewId]];
+        config.userContentController = userController;
+        currentWebView = [[WKWebView alloc] initWithFrame:self.bounds configuration:config];
+        [webViews addObject:currentWebView];
+        [webViewsInUse addObject: @YES];
+      } else {
+        NSString* name = [NSString stringWithFormat:@"reactNative%lu", currentWebViewId];
+        [currentWebView.configuration setProcessPool: processPool];
+        [currentWebView.configuration.userContentController addScriptMessageHandler:[[WeakScriptMessageDelegate alloc] initWithDelegate:self] name:name];
+        webViewsInUse[currentWebViewId] = @YES;
+      }
+
+      _webView = currentWebView;
+      _webView.UIDelegate = self;
+      _webView.navigationDelegate = self;
+      _webView.scrollView.delegate = self;
+
+  #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
+      // `contentInsetAdjustmentBehavior` is only available since iOS 11.
+      // We set the default behavior to "never" so that iOS
+      // doesn't do weird things to UIScrollView insets automatically
+      // and keeps it as an opt-in behavior.
+      if ([_webView.scrollView respondsToSelector:@selector(setContentInsetAdjustmentBehavior:)]) {
+        _webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+      }
+  #endif
+      [self setupPostMessageScript];
+      [_webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
+      [self addSubview:_webView];
+    }
+    return self;
 }
 
 - (void)setInjectJavaScript:(NSString *)injectJavaScript {
@@ -163,7 +177,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
                            "if (typeof targetOrigin !== 'undefined') {"
                               "window.originalPostMessage(message, targetOrigin, transfer);"
                            "}"
-                         "};", webViewId];
+                         "};", currentWebViewId];
     WKUserScript *script = [[WKUserScript alloc] initWithSource:source
                                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart
                                                forMainFrameOnly:_injectedJavaScriptForMainFrameOnly];
@@ -434,7 +448,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
 - (void)dealloc
 {
-  NSString* name = [NSString stringWithFormat:@"reactNative%lu", webViewId];
+  NSString* name = [NSString stringWithFormat:@"reactNative%lu", currentWebViewId];
   [_webView.configuration.userContentController removeScriptMessageHandlerForName:name];
   [_webView removeFromSuperview];
   [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
