@@ -520,7 +520,8 @@ class WKWebView extends React.Component {
   };
 
   static reset = () => {
-    return WKWebViewManager.reset('');
+    WKWebViewManager.reset('');
+    return Promise.resolve();
   }
 
   /**
